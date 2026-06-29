@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sowa Rigpa Clinical Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --lapis-blue: #1C3F60;
+            --deep-lapis: #0B2136;
+            --soft-gold: #D4AF37;
+            --earth-light: #F4EAE0;
+            --earth-warm: #C89F70;
+            --text-dark: #2C2C2C;
+            --white: #FFFFFF;
+            --border-light: #E0D5C1;
+        }
+
+        body { background-color: var(--earth-light); color: var(--text-dark); margin: 0; font-family: sans-serif; }
+        .container { max-width: 900px; margin: 40px auto; padding: 20px; }
+        .card { background: var(--white); padding: 25px; border-radius: 12px; border: 2px solid var(--soft-gold); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h3 { color: var(--deep-lapis); display: flex; align-items: center; gap: 10px; }
+        textarea { width: 100%; padding: 15px; border: 1px solid var(--border-light); border-radius: 8px; margin-bottom: 15px; }
+        .btn-primary { background: var(--lapis-blue); color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        
+        .dispensary-schedule { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px; }
+        .schedule-slot { background: #f8fafc; border-top: 4px solid var(--lapis-blue); padding: 15px; border-radius: 8px; }
+        .clinical-warning { background: #fef3c7; padding: 15px; border-left: 4px solid #d97706; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <h3>AI Clinical Intake <span style="font-size: 0.7rem; background: var(--lapis-blue); color: var(--soft-gold); padding: 2px 8px; border-radius: 10px;">TUTOR MODE</span></h3>
+        <textarea id="patientInput" rows="4" placeholder="Enter patient story (e.g. palpitations, acid reflux, anxiety...)"></textarea>
+        <button class="btn-primary" onclick="generateDynamicProtocol()">Generate Yuthok Protocol</button>
+        
+        <div id="outputArea"></div>
+    </div>
+</div>
+
+<script>
+const db = {
+    symptoms: {
+        rLung: ["palpitations", "anxiety", "insomnia", "dry skin", "joint pain"],
+        mKhris: ["acid reflux", "bitter taste", "angry", "heartburn", "fever"],
+        Beken: ["heavy", "bloating", "sleepy", "congestion", "pale"]
+    }
+};
+
+function generateDynamicProtocol() {
+    const text = document.getElementById("patientInput").value.toLowerCase();
+    let scores = { rLung: 0, mKhris: 0 };
+
+    for (let nyepa in db.symptoms) {
+        db.symptoms[nyepa].forEach(symptom => {
+            if (text.includes(symptom)) scores[nyepa]++;
+        });
+    }
+
+    let resultHTML = `<div class="clinical-warning"><h4>Analysis Results</h4>`;
+    
+    if (scores.rLung > 0 && scores.mKhris > 0) {
+        resultHTML += `
+            <p><strong>Conflict Detected:</strong> Wind & Fire. Restricted to neutral/grounding therapies.</p>
+            <div class="dispensary-schedule">
+                <div class="schedule-slot"><strong>Morning:</strong> None</div>
+                <div class="schedule-slot"><strong>Lunch:</strong> Chong-shi 6 (Cooling)</div>
+                <div class="schedule-slot"><strong>Bedtime:</strong> Bimala (Grounding)</div>
+            </div>`;
+    } else {
+        resultHTML += `<p>Protocol generated based on primary imbalance detected.</p>`;
+    }
+    
+    resultHTML += `</div>`;
+    document.getElementById("outputArea").innerHTML = resultHTML;
+}
+</script>
+
+</body>
+</html>
